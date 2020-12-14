@@ -64,13 +64,15 @@ class MainScreen(FloatLayout):
             y_ticks_major=1,
             y_grid_label=True,
             x_grid_label=True,
-            padding=150,
+            padding=10,
             xlog=False,
             ylog=False,
             x_grid=True,
             y_grid=True,
-            ymin=-10,
-            ymax=10)
+            ymin=-5,
+            ymax=5,
+            size_hint=(0.7, 0.5),
+            pos_hint={'x':0.25, 'y':0.3})
         self.plot = MeshLinePlot(mode='line_strip', color=[1, 1, 0, 1])
         self.plot.points = [(x / 10., sin(x / 10.)*4) for x in range(-0, 5000)]
         self.graph.add_plot(self.plot)

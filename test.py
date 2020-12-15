@@ -1,9 +1,21 @@
-from math import sin
-from kivy_garden.graph import Graph, MeshLinePlot
-graph = Graph(xlabel='X', ylabel='Y', x_ticks_minor=5,
-              x_ticks_major=25, y_ticks_major=1,
-              y_grid_label=True, x_grid_label=True, padding=5,
-              x_grid=True, y_grid=True, xmin=-0, xmax=100, ymin=-1, ymax=1)
-plot = MeshLinePlot(color=[1, 0, 0, 1])
-plot.points = [(x, sin(x / 10.)) for x in range(0, 101)]
-graph.add_plot(plot)
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+##################################################
+# google-home-test
+# Title: 
+# Author: Vojtěch Petrásek 
+# Generated: 07/12/2020 09:59:10
+##################################################
+
+import requests
+
+log = open('test.log','a')
+try:
+    headers = {'content-type': 'application/json'}
+    r = requests.get('http://0.0.0.0:8000/update')
+    log.write(str(r) + "\n")
+    print(r.text)
+except Exception as e:
+    print(e)
+    log.write(str(e) + "\n")

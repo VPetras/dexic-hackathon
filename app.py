@@ -20,18 +20,19 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.dropdown import DropDown 
 from kivy.uix.widget import Widget
+from kivy.uix.image import Image
 from kivy.base import runTouchApp
 from kivy.uix.floatlayout import FloatLayout
 from kivy.clock import Clock
-from kivy.core.window import Window
 from kivy_garden.graph import Graph, MeshLinePlot
 import os
 import sys
 import threading
 import time
 import kivy
+import requests
+import json
 from math import sin
-#import kivy_garden
 #import RPi.GPIO as GPIO
 
 
@@ -48,6 +49,11 @@ class MainScreen(FloatLayout):
         self.add_widget(self.githublabel)
         self.add_widget(self.button)
         #self.button.disabled=True
+
+        self.dex = Image(source="dex-logo.jpg", size_hint=(0.15, 0.15), pos_hint={'x':0.16, 'y':0.05})
+        self.add_widget(self.dex)
+        self.eit = Image(source="EIT-Health.jpg", size_hint=(0.15, 0.15), pos_hint={'x':0.01, 'y':0.05})
+        self.add_widget(self.eit)
 
         self.ier_button = Button(text ='IE / R',font_size = 30, size_hint=(0.1, 0.05), pos_hint={'x':0.01, 'y':0.75})
         self.add_widget(self.ier_button)
@@ -69,21 +75,40 @@ class MainScreen(FloatLayout):
             ylog=False,
             x_grid=True,
             y_grid=True,
-            ymin=-5,
-            ymax=5,
+            ymin=0,
+            ymax=200,
             size_hint=(0.7, 0.5),
             pos_hint={'x':0.25, 'y':0.3})
-        self.plot = MeshLinePlot(mode='line_strip', color=[1, 1, 0, 1])
-        self.plot.points = [(x / 10., sin(x / 10.)*4) for x in range(-0, 5000)]
+        self.plot = MeshLinePlot(mode='line_strip', color=[1, 0, 0, 1])
+        values = [0]
+        self.plot.points = [(x, values[x]) for x in range(-0, len(values))]
         self.graph.add_plot(self.plot)
         self.add_widget(self.graph)
+
+    def update_graph(self, *args):
+        print("update graph")
+        #log = open('test.log','a')
+        try:
+            headers = {'content-type': 'application/json'}
+            r = requests.get('http://0.0.0.0:8000/update')
+            #log.write(str(r) + "\n")
+            print(r.text)
+            values = json.loads(r.text)
+            print(values)
+            self.graph.xmax = len(values)
+            self.plot.points = [(x, values[x]) for x in range(-0, len(values))]
+        except Exception as e:
+            print(e)
+            #log.write(str(e) + "\n")
 
 
 class GuiApp(App):
 
     def build(self):
         self.title = 'DEX-IC smart vent'
-        return MainScreen()
+        screen = MainScreen()
+        Clock.schedule_interval(screen.update_graph, 0.1)
+        return screen
 
 if __name__ == '__main__':
     try:

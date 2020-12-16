@@ -42,9 +42,13 @@ class MainScreen(FloatLayout):
         super(MainScreen, self).__init__(**kwargs)
         self.thread = None
         self.started = False
+        self.ie_val = 2
+        self.av_val = 200
+        self.rr_val = 20
         self.mainlabel = Label(text ="DEX-IC smart vent",font_size = 60, size_hint=(1, 0.2), pos_hint={'x':0, 'y':0.8})
         self.githublabel = Label(text ="github.com/VPetras/dexic-hackathon",font_size = 25, size_hint=(1.6, 0.1), pos_hint={'x':0.08, 'y':0})
-        self.button = Button(text ='STOP',font_size = 30, size_hint=(0.3, 0.1), pos_hint={'x':0.35, 'y':0.01})
+        self.button = Button(text ='Start',font_size = 30, size_hint=(0.3, 0.1), pos_hint={'x':0.35, 'y':0.01})
+        self.button.bind(on_press = self.stop_btn)
         self.add_widget(self.mainlabel)
         self.add_widget(self.githublabel)
         self.add_widget(self.button)
@@ -55,12 +59,32 @@ class MainScreen(FloatLayout):
         self.eit = Image(source="EIT-Health.jpg", size_hint=(0.15, 0.15), pos_hint={'x':0.01, 'y':0.05})
         self.add_widget(self.eit)
 
-        self.ier_button = Button(text ='IE / R',font_size = 30, size_hint=(0.1, 0.05), pos_hint={'x':0.01, 'y':0.75})
+        self.ier_button = Button(text ="IE / R = 1:{}".format(self.ie_val),font_size = 30, size_hint=(0.15, 0.1), pos_hint={'x':0.01, 'y':0.75})
         self.add_widget(self.ier_button)
-        self.av_button = Button(text ='A / V',font_size = 30, size_hint=(0.1, 0.05), pos_hint={'x':0.01, 'y':0.65})
+        self.ier_p_button = Button(text ='+',font_size = 30, size_hint=(0.075, 0.05), pos_hint={'x':0.085, 'y':0.68})
+        self.ier_p_button.bind(on_press = self.ie_p)
+        self.add_widget(self.ier_p_button)
+        self.ier_m_button = Button(text ='-',font_size = 30, size_hint=(0.075, 0.05), pos_hint={'x':0.01, 'y':0.68})
+        self.ier_m_button.bind(on_press = self.ie_m)
+        self.add_widget(self.ier_m_button)
+
+        self.av_button = Button(text ="A V = {}".format(self.av_val),font_size = 30, size_hint=(0.15, 0.1), pos_hint={'x':0.01, 'y':0.55})
         self.add_widget(self.av_button)
-        self.rr_button = Button(text ='R / R',font_size = 30, size_hint=(0.1, 0.05), pos_hint={'x':0.01, 'y':0.55})
+        self.av_p_button = Button(text ='+',font_size = 30, size_hint=(0.075, 0.05), pos_hint={'x':0.085, 'y':0.48})
+        self.av_p_button.bind(on_press = self.av_p)
+        self.add_widget(self.av_p_button)
+        self.av_m_button = Button(text ='-',font_size = 30, size_hint=(0.075, 0.05), pos_hint={'x':0.01, 'y':0.48})
+        self.av_m_button.bind(on_press = self.av_m)
+        self.add_widget(self.av_m_button)
+
+        self.rr_button = Button(text ="R / R = {}".format(self.rr_val),font_size = 30, size_hint=(0.15, 0.1), pos_hint={'x':0.01, 'y':0.35})
         self.add_widget(self.rr_button)
+        self.rr_p_button = Button(text ='+',font_size = 30, size_hint=(0.075, 0.05), pos_hint={'x':0.085, 'y':0.28})
+        self.rr_p_button.bind(on_press = self.rr_p)
+        self.add_widget(self.rr_p_button)
+        self.rr_m_button = Button(text ='-',font_size = 30, size_hint=(0.075, 0.05), pos_hint={'x':0.01, 'y':0.28})
+        self.rr_m_button.bind(on_press = self.rr_m)
+        self.add_widget(self.rr_m_button)
 
         self.graph = Graph(
             xlabel='Time',
@@ -73,8 +97,8 @@ class MainScreen(FloatLayout):
             padding=10,
             xlog=False,
             ylog=False,
-            x_grid=True,
-            y_grid=True,
+            x_grid=False,
+            y_grid=False,
             ymin=0,
             ymax=200,
             size_hint=(0.7, 0.5),
@@ -84,6 +108,45 @@ class MainScreen(FloatLayout):
         self.plot.points = [(x, values[x]) for x in range(-0, len(values))]
         self.graph.add_plot(self.plot)
         self.add_widget(self.graph)
+
+    def stop_btn(self, x):
+        if self.started:
+            self.button.text="Start"
+            self.started = False
+        else:
+            self.button.text="Stop"
+            self.started = True
+
+    def ie_p(self,x):
+        if self.ie_val + 0.1 < 3.1:
+            self.ie_val += 0.1
+            self.ier_button.text="IE / R = 1:{:.1f}".format(self.ie_val)
+
+    def ie_m(self,x):
+        if self.ie_val - 0.1 > 0.9:
+            self.ie_val -= 0.1
+            self.ier_button.text="IE / R = 1:{:.1f}".format(self.ie_val)
+
+    def av_p(self,x):
+        if self.av_val + 50 < 850:
+            self.av_val += 50
+            self.av_button.text="A V = {}".format(self.av_val)
+
+    def av_m(self,x):
+        if self.av_val - 50 > 150:
+            self.av_val -= 50
+            self.av_button.text="A V = {}".format(self.av_val)
+
+    def rr_p(self,x):
+        if self.rr_val + 1 < 41:
+            self.rr_val += 1
+            self.rr_button.text="R / R = {}".format(self.rr_val)
+
+    def rr_m(self,x):
+        if self.rr_val - 1 > 5:
+            self.rr_val -= 1
+            self.rr_button.text="R / R = {}".format(self.rr_val)
+
 
     def update_graph(self, *args):
         print("update graph")

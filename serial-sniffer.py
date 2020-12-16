@@ -35,9 +35,11 @@ def main(graph_data):
         #log = open('request.log','a')
         try:
             headers = {'content-type': 'application/json'}
-            r = requests.post('http://0.0.0.0:8000/upload', str(graph_data))
+            r = requests.post('http://192.168.1.21:8000/upload', str(graph_data))
+            requests.post('http://0.0.0.0:8000/upload', str(graph_data))
             #log.write(str(r) + "\n")
         except Exception as e:
+            print(e)
             #log.write(str(e) + "\n")
 
 if __name__ == '__main__':

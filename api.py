@@ -12,7 +12,7 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-data = [(0,0.0)]
+data = [0,0,0]
 @app.route('/upload', methods=['POST'])
 def upload():
     #print(request.data)
